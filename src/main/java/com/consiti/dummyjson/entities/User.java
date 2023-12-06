@@ -20,7 +20,6 @@ public class User implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Lob
-	@Column(columnDefinition = "CLOB")
 	private String jsonData;
 	
 	public User(String jsonData) {
