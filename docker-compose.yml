@@ -1,0 +1,47 @@
+version: '2.4'
+
+services:
+  shopify-app:
+    image: shopify-dummy
+    build: .
+    ports:
+      - 8084:8084
+    depends_on:
+      - shopify-database
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MYSQL_URL=jdbc:mysql://shopify-database:3306/usuarios?useSSL=false&serverTimezone=UTC&useLegacyDateTimeCode=false&allowPublicKeyRetrieval=true
+      - MYSQL_USERNAME=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+
+  maven: # Agregamos un servicio llamado 'maven'
+    image: maven:3.9.5-sapmachine-17
+    volumes:
+      - /opt/dummy-shopify:/app  # Compartimos el volumen con el servicio maven
+
+  shopify-database:
+    image: mysql:latest
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      # - /opt/dummy-shopify:/var/lib/mysql
+      # - /opt/dummy-shopify:/opt/dummy-shopify
+      - /opt/dummy-shopify/mysql-data:/var/lib/mysql
+
+  shopify-phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8085:80"  
+    environment:
+      PMA_HOST: shopify-database
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+volumes:
+  mysql-data:
