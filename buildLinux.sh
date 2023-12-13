@@ -9,7 +9,8 @@ fi
 
 # Configuration of the project with the wrapper and compilation (excluding tests).
 compile() {
-    docker-compose run --rm -w /app maven mvn clean package -DskipTests
+    # docker-compose run --rm -w /app maven mvn clean package -DskipTests
+    echo "Compilando el paquete"
 }
 
 # Compile the project into the .jar and run it locally (outside the container).

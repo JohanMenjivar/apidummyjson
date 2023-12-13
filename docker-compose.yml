@@ -1,11 +1,17 @@
 version: '2.4'
 
+networks:
+  shopify-network:
+    driver: bridge
+
 services:
   shopify-app:
-    image: shopify-dummy
-    build: .
+    container_name: shopify-app
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - 8084:8084
+      - "8084:8084"
     depends_on:
       - shopify-database
     environment:
@@ -13,11 +19,8 @@ services:
       - MYSQL_URL=jdbc:mysql://shopify-database:3306/usuarios?useSSL=false&serverTimezone=UTC&useLegacyDateTimeCode=false&allowPublicKeyRetrieval=true
       - MYSQL_USERNAME=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-
-  maven: # Agregamos un servicio llamado 'maven'
-    image: maven:3.9.5-sapmachine-17
-    volumes:
-      - /opt/dummy-shopify:/app  # Compartimos el volumen con el servicio maven
+    networks:
+      - shopify-network
 
   shopify-database:
     image: mysql:latest
@@ -29,19 +32,21 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      # - /opt/dummy-shopify:/var/lib/mysql
-      # - /opt/dummy-shopify:/opt/dummy-shopify
       - /opt/dummy-shopify/mysql-data:/var/lib/mysql
+    networks:
+      - shopify-network
 
   shopify-phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
-      - "8085:80"  
+      - "8085:80"
     environment:
       PMA_HOST: shopify-database
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - shopify-network
 
 volumes:
   mysql-data:
