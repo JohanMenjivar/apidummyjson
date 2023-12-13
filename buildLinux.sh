@@ -10,7 +10,8 @@ fi
 # Configuration of the project with the wrapper and compilation (excluding tests).
 compile() {
     # docker-compose run --rm -w /app maven mvn clean package -DskipTests
-    echo "Compilando el paquete"
+    echo "Compilando el docker-compose.yml"
+    docker-compose build
 }
 
 # Compile the project into the .jar and run it locally (outside the container).
@@ -31,14 +32,12 @@ configure_mysql() {
 
 # Start the application using Docker Compose.
 start() {
-    configure_mysql
     docker-compose up
 }
 
 # Perform a full build and then start the application.
 full() {
     compile
-    rebuild
     start
 }
 
